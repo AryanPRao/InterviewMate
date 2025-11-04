@@ -2,14 +2,18 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaMagic, FaLightbulb } from 'react-icons/fa';
 
 export default function Tracker() {
   const router = useRouter();
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showSuggestModal, setShowSuggestModal] = useState(false);
   const [editingProblem, setEditingProblem] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState('None');
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
   const [formData, setFormData] = useState({
     number: '',
     name: '',
@@ -17,6 +21,10 @@ export default function Tracker() {
     topic: '',
     summary: ''
   });
+
+  const topics = ['None', 'Arrays', 'Strings', 'Linked Lists', 'Trees', 'Graphs', 'Dynamic Programming', 
+                  'Greedy', 'Backtracking', 'Binary Search', 'Sorting', 'Hash Tables', 'Stacks & Queues',
+                  'Heaps', 'Bit Manipulation', 'Math', 'Recursion', 'Sliding Window', 'Two Pointers'];
 
   useEffect(() => {
     const userId = localStorage.getItem('user_id');
@@ -103,6 +111,31 @@ export default function Tracker() {
     }
   };
 
+  const handleSuggestProblems = async () => {
+    setLoadingRecommendations(true);
+    setRecommendations([]);
+
+    try {
+      const userId = localStorage.getItem('user_id');
+      const response = await axios.post('http://localhost:5000/api/suggest-problems', {
+        user_id: userId,
+        topic: selectedTopic === 'None' ? null : selectedTopic
+      });
+
+      setRecommendations(response.data.recommendations || []);
+      
+      if (response.data.recommendations.length === 0 && response.data.raw_text) {
+        alert('Received recommendations but could not parse them. Check console for details.');
+        console.log('Raw recommendations:', response.data.raw_text);
+      }
+    } catch (error) {
+      console.error('Error getting recommendations:', error);
+      alert('Failed to get recommendations. Please make sure Gemini API is configured.');
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
   const getDifficultyBadge = (difficulty) => {
     const classes = {
       Easy: 'badge-easy',
@@ -124,7 +157,7 @@ export default function Tracker() {
 
         <div className="mb-4 fade-in-up">
           <button 
-            className="btn btn-primary-custom"
+            className="btn btn-primary-custom me-2"
             onClick={() => {
               setEditingProblem(null);
               setFormData({
@@ -139,6 +172,18 @@ export default function Tracker() {
           >
             <FaPlus style={{ marginRight: '0.5rem' }} />
             Add New Problem
+          </button>
+          
+          <button 
+            className="btn btn-success"
+            onClick={() => {
+              setSelectedTopic('None');
+              setRecommendations([]);
+              setShowSuggestModal(true);
+            }}
+          >
+            <FaMagic style={{ marginRight: '0.5rem' }} />
+            Suggest Problems (AI)
           </button>
         </div>
 
@@ -318,6 +363,110 @@ export default function Tracker() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Suggest Problems Modal */}
+      {showSuggestModal && (
+        <div 
+          className="modal fade show" 
+          style={{ display: 'block', background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setShowSuggestModal(false)}
+        >
+          <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content" style={{ borderRadius: '20px', border: 'none' }}>
+              <div className="modal-header" style={{ 
+                background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                color: 'white',
+                borderRadius: '20px 20px 0 0'
+              }}>
+                <h5 className="modal-title">
+                  <FaMagic className="me-2" />
+                  AI Problem Suggestions
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close btn-close-white" 
+                  onClick={() => setShowSuggestModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body" style={{ padding: '2rem' }}>
+                <p className="text-muted mb-3">
+                  Get personalized problem recommendations based on your progress!
+                </p>
+
+                <div className="mb-4">
+                  <label className="form-label fw-bold">Would you like to practice a specific topic?</label>
+                  <select
+                    className="form-select"
+                    value={selectedTopic}
+                    onChange={(e) => setSelectedTopic(e.target.value)}
+                  >
+                    {topics.map(topic => (
+                      <option key={topic} value={topic}>{topic}</option>
+                    ))}
+                  </select>
+                  <small className="text-muted">
+                    Select "None" for general recommendations based on your progress
+                  </small>
+                </div>
+
+                <button 
+                  className="btn btn-success w-100 mb-3"
+                  onClick={handleSuggestProblems}
+                  disabled={loadingRecommendations}
+                >
+                  {loadingRecommendations ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                      Getting Recommendations...
+                    </>
+                  ) : (
+                    <>
+                      <FaLightbulb className="me-2" />
+                      Get Recommendations
+                    </>
+                  )}
+                </button>
+
+                {/* Recommendations Display */}
+                {recommendations.length > 0 && (
+                  <div>
+                    <h6 className="fw-bold mb-3">Recommended Problems:</h6>
+                    <div className="list-group">
+                      {recommendations.map((rec, index) => (
+                        <div key={index} className="list-group-item">
+                          <div className="d-flex justify-content-between align-items-start">
+                            <div className="flex-grow-1">
+                              <h6 className="mb-1">{rec.problem_name}</h6>
+                              <div className="mb-2">
+                                <span className={`badge ${
+                                  rec.difficulty === 'Easy' ? 'bg-success' : 
+                                  rec.difficulty === 'Medium' ? 'bg-warning' : 
+                                  'bg-danger'
+                                } me-2`}>
+                                  {rec.difficulty}
+                                </span>
+                                <span className="badge bg-secondary">{rec.topic}</span>
+                              </div>
+                              <p className="mb-0 text-muted small">{rec.reason}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {recommendations.length === 0 && !loadingRecommendations && (
+                  <div className="text-center text-muted py-3">
+                    <FaLightbulb size={40} className="mb-2 opacity-50" />
+                    <p>Click "Get Recommendations" to see suggested problems</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

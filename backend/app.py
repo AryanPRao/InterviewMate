@@ -584,6 +584,113 @@ Resume Text:
     except Exception as e:
         return jsonify({'error': f'Analysis error: {str(e)}'}), 500
 
+# ========== AI PROBLEM RECOMMENDATION ENDPOINT ==========
+
+@app.route('/api/suggest-problems', methods=['POST'])
+def suggest_problems():
+    try:
+        if not GEMINI_API_KEY:
+            return jsonify({'error': 'Gemini API key not configured'}), 500
+        
+        data = request.json
+        user_id = data.get('user_id')
+        topic = data.get('topic')  # Can be None or a specific topic
+        
+        if not user_id:
+            return jsonify({'error': 'user_id required'}), 400
+        
+        # Get all solved problems for the user
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            'SELECT number, name, difficulty, topic FROM problems WHERE user_id = %s',
+            (user_id,)
+        )
+        solved_problems = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        # Format solved problems list
+        solved_list = []
+        for p in solved_problems:
+            solved_list.append(f"{p['number']} - {p['name']} ({p['difficulty']}, {p['topic']})")
+        
+        solved_problem_list = "\n".join(solved_list) if solved_list else "No problems solved yet."
+        
+        # Build Gemini prompt
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        
+        if topic and topic.lower() != 'none':
+            prompt = f"""You are an expert DSA tutor helping users improve coding problem coverage.
+
+The user has already solved the following problems (from their practice tracker):
+{solved_problem_list}
+
+They want new recommendations specifically for the topic: {topic}
+
+Recommend 5 unsolved LeetCode-style problems from the {topic} topic, balanced across easy, medium, and hard difficulties. Ensure these problems are NOT in the solved list above.
+
+Format your response STRICTLY as a JSON array (no markdown, no extra text):
+[
+  {{"problem_name": "Two Sum", "topic": "Arrays", "difficulty": "Easy", "reason": "Classic problem for hash maps"}},
+  {{"problem_name": "...", "topic": "...", "difficulty": "...", "reason": "..."}}
+]
+"""
+        else:
+            prompt = f"""You are an expert DSA tutor helping users improve coding problem coverage.
+
+The user has already solved the following problems (from their practice tracker):
+{solved_problem_list}
+
+They want general recommendations (no specific topic).
+
+Recommend 5 problems total:
+- 3 problems that are similar to the solved ones (based on topic/difficulty patterns, but slightly harder or related)
+- 2 problems that are new topics but relevant to their learning curve
+
+Ensure these problems are NOT in the solved list above.
+
+Format your response STRICTLY as a JSON array (no markdown, no extra text):
+[
+  {{"problem_name": "Two Sum", "topic": "Arrays", "difficulty": "Easy", "reason": "Classic problem for hash maps"}},
+  {{"problem_name": "...", "topic": "...", "difficulty": "...", "reason": "..."}}
+]
+"""
+        
+        response = model.generate_content(prompt)
+        recommendations_text = response.text.strip()
+        
+        # Try to parse JSON (remove markdown if present)
+        if recommendations_text.startswith('```'):
+            # Remove markdown code blocks
+            recommendations_text = recommendations_text.split('```')[1]
+            if recommendations_text.startswith('json'):
+                recommendations_text = recommendations_text[4:]
+            recommendations_text = recommendations_text.strip()
+        
+        # Parse JSON
+        import json
+        try:
+            recommendations = json.loads(recommendations_text)
+        except json.JSONDecodeError:
+            # If JSON parsing fails, return raw text
+            return jsonify({
+                'recommendations': [],
+                'raw_text': recommendations_text,
+                'message': 'Could not parse recommendations as JSON'
+            }), 200
+        
+        return jsonify({
+            'recommendations': recommendations,
+            'topic': topic,
+            'message': 'Recommendations generated successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Recommendation error: {str(e)}'}), 500
+
 # ========== LEADERBOARD ENDPOINT ==========
 
 @app.route('/api/leaderboard', methods=['GET'])
