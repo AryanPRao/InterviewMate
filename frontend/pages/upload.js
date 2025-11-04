@@ -2,15 +2,19 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import { FaFileUpload, FaFilePdf, FaDownload } from 'react-icons/fa';
+import { FaFileUpload, FaFilePdf, FaDownload, FaMagic } from 'react-icons/fa';
 
 export default function Upload() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [resumes, setResumes] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [analysis, setAnalysis] = useState('');
+  const [candidateName, setCandidateName] = useState('');
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem('user_id');
@@ -46,6 +50,8 @@ export default function Upload() {
         return;
       }
       setSelectedFile(file);
+      setAnalysis('');
+      setShowAnalysis(false);
     }
   };
 
@@ -72,12 +78,9 @@ export default function Upload() {
 
       setUploadSuccess(true);
       setSelectedFile(null);
-      // Reset file input
       document.getElementById('fileInput').value = '';
-      // Refresh resume list
       fetchResumes();
 
-      // Hide success message after 3 seconds
       setTimeout(() => setUploadSuccess(false), 3000);
     } catch (error) {
       console.error('Error uploading resume:', error);
@@ -87,14 +90,49 @@ export default function Upload() {
     }
   };
 
+  const handleAnalyze = async () => {
+    if (!selectedFile) {
+      alert('Please select a file first');
+      return;
+    }
+
+    setAnalyzing(true);
+    setAnalysis('');
+    setCandidateName('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const response = await axios.post('http://localhost:5000/api/analyze-resume', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      setAnalysis(response.data.analysis);
+      setCandidateName(response.data.candidate_name || '');
+      setShowAnalysis(true);
+    } catch (error) {
+      console.error('Error analyzing resume:', error);
+      if (error.response?.data?.error) {
+        alert(error.response.data.error);
+      } else {
+        alert('Failed to analyze resume. Please make sure Gemini API key is configured.');
+      }
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh' }}>
       <Navbar />
       
       <div className="container mt-5">
         <div className="text-center mb-5">
-          <h1 style={{ color: 'white', fontWeight: 'bold' }}>Resume Upload 📄</h1>
-          <p style={{ color: 'rgba(255,255,255,0.9)' }}>Upload and manage your resumes securely on AWS S3</p>
+          <h1 style={{ color: 'white', fontWeight: 'bold' }}>Resume Upload & Analysis 📄</h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)' }}>Upload your resume and get AI-powered feedback</p>
         </div>
 
         {/* Upload Section */}
@@ -102,18 +140,19 @@ export default function Upload() {
           <div className="col-12">
             <div className="card shadow">
               <div className="card-body p-4">
-                <h3 className="mb-3">Upload New Resume</h3>
+                <h3 className="mb-3">Upload & Analyze Resume</h3>
                 <p className="text-muted mb-4">
-                  Upload your resume in PDF format (max 5MB). Your file will be securely stored on AWS S3.
+                  Upload your resume in PDF format (max 5MB). Get instant AI analysis or store it securely on AWS S3.
                 </p>
 
                 {uploadSuccess && (
                   <div className="alert alert-success mb-4">
-                    ✅ Resume uploaded successfully!
+                    ✅ Resume uploaded successfully to AWS S3!
                   </div>
                 )}
 
                 <div className="mb-4">
+                  <label className="form-label fw-bold">Select PDF Resume</label>
                   <input
                     type="file"
                     id="fileInput"
@@ -130,30 +169,55 @@ export default function Upload() {
                   )}
                 </div>
 
-                <button 
-                  className="btn btn-primary"
-                  onClick={handleUpload}
-                  disabled={!selectedFile || uploading}
-                  style={{ pointerEvents: 'auto' }}
-                >
-                  {uploading ? 'Uploading...' : 'Upload to AWS S3'}
-                </button>
-
-                <div className="mt-4 p-3 bg-light rounded border-start border-primary border-4">
-                  <h5 className="fw-bold mb-2">💡 Optional: AI Resume Analysis</h5>
-                  <p className="text-muted mb-1">
-                    To enable AI-powered resume feedback using Google's Gemini API:
-                  </p>
-                  <ul className="text-muted mb-0">
-                    <li>Add your GEMINI_API_KEY to the backend .env file</li>
-                    <li>Implement the analysis endpoint in app.py</li>
-                    <li>Get suggestions on formatting, keywords, and content improvements</li>
-                  </ul>
+                <div className="d-flex gap-2 flex-wrap">
+                  <button 
+                    className="btn btn-success"
+                    onClick={handleAnalyze}
+                    disabled={!selectedFile || analyzing}
+                    style={{ pointerEvents: 'auto' }}
+                  >
+                    <FaMagic className="me-2" />
+                    {analyzing ? 'Analyzing with AI...' : 'Analyze with Gemini AI'}
+                  </button>
+                  
+                  <button 
+                    className="btn btn-primary"
+                    onClick={handleUpload}
+                    disabled={!selectedFile || uploading}
+                    style={{ pointerEvents: 'auto' }}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload to AWS S3'}
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* AI Analysis Results */}
+        {showAnalysis && analysis && (
+          <div className="row mb-4">
+            <div className="col-12">
+              <div className="card shadow border-success">
+                <div className="card-header bg-success text-white">
+                  <h4 className="mb-0">
+                    <FaMagic className="me-2" />
+                    AI Resume Analysis {candidateName && candidateName !== 'the candidate' && `for ${candidateName}`}
+                  </h4>
+                </div>
+                <div className="card-body p-4">
+                  <div style={{ 
+                    whiteSpace: 'pre-wrap', 
+                    lineHeight: '1.8',
+                    fontSize: '1rem'
+                  }}>
+                    {analysis}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Uploaded Resumes List */}
         <div className="row mb-5">
@@ -213,16 +277,34 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* AWS S3 Info */}
+        {/* Info Cards */}
         <div className="row mb-5">
-          <div className="col-md-6 mb-3">
+          <div className="col-md-4 mb-3">
+            <div className="card shadow h-100">
+              <div className="card-body">
+                <h5 className="card-title">🤖 AI-Powered Analysis</h5>
+                <p className="card-text">
+                  Get instant feedback on your resume using Google's Gemini AI:
+                </p>
+                <ul className="text-muted small">
+                  <li>Overall impression & strengths</li>
+                  <li>Areas for improvement</li>
+                  <li>Technical skills assessment</li>
+                  <li>Format & readability check</li>
+                  <li>Actionable recommendations</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-4 mb-3">
             <div className="card shadow h-100">
               <div className="card-body">
                 <h5 className="card-title">☁️ Secure Cloud Storage</h5>
                 <p className="card-text">
-                  Your resumes are stored securely on Amazon S3 with enterprise-grade encryption and reliability.
+                  Your resumes are stored securely on Amazon S3:
                 </p>
-                <ul className="text-muted">
+                <ul className="text-muted small">
                   <li>99.999999999% durability</li>
                   <li>Encrypted at rest and in transit</li>
                   <li>Scalable and cost-effective</li>
@@ -232,17 +314,17 @@ export default function Upload() {
             </div>
           </div>
 
-          <div className="col-md-6 mb-3">
+          <div className="col-md-4 mb-3">
             <div className="card shadow h-100">
               <div className="card-body">
                 <h5 className="card-title">🔒 Privacy & Security</h5>
                 <p className="card-text">
-                  We take your privacy seriously. Your uploaded files are:
+                  We take your privacy seriously:
                 </p>
-                <ul className="text-muted">
+                <ul className="text-muted small">
                   <li>Only accessible by you</li>
                   <li>Protected by AWS IAM policies</li>
-                  <li>Stored with unique identifiers</li>
+                  <li>AI analysis is instant & private</li>
                   <li>Never shared with third parties</li>
                 </ul>
               </div>
