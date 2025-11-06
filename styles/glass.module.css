@@ -58,7 +58,7 @@
 }
 
 .glassButton {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(59, 130, 246, 0.3);
@@ -107,4 +107,46 @@
   letter-spacing: -0.02em;
   text-shadow: 0 0 30px rgba(59, 130, 246, 0.3), 0 0 60px rgba(59, 130, 246, 0.15);
   color: #F9FAFB;
+}
+
+/* Primary heading style (Welcome) */
+.primaryHeading {
+  color: #A5B4FC; /* soft lavender-blue */
+  font-weight: 800;
+  font-family: 'Poppins', 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  text-shadow: 0 0 10px rgba(165, 180, 252, 0.6);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+  margin: 0;
+}
+
+/* Subheading style */
+.subheading {
+  color: #D1D5DB; /* cool neutral */
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+  margin-top: 0.5rem;
+  font-size: 1.125rem;
+}
+
+/* Card title (with optional gradient via inline style) */
+.cardTitle {
+  color: #F3F4F6; /* near white */
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.gradientText {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Card description */
+.cardDescription {
+  color: #9CA3AF;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
 }

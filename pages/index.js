@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import dynamic from 'next/dynamic'
-const DynamicLiquidChrome = dynamic(() => import('../components/LiquidChrome'), { ssr: false })
+const DynamicSilk = dynamic(() => import('../components/Silk'), { ssr: false })
 import Navbar from "../components/Navbar"
 import AnimatedCard from "../components/AnimatedCard"
 import { FaClipboardList, FaChartLine, FaFileUpload, FaTrophy } from "react-icons/fa"
@@ -33,6 +33,7 @@ export default function Home() {
         "Log and organize your coding problems by difficulty, topic, and track your progress systematically.",
       link: "/tracker",
       color: "#60A5FA",
+      gradient: "linear-gradient(to right, #60A5FA, #3B82F6)",
     },
     {
       icon: <FaChartLine />,
@@ -41,6 +42,7 @@ export default function Home() {
         "Visualize your progress with beautiful charts showing problems solved by difficulty, topic, and points earned.",
       link: "/dashboard",
       color: "#6366F1",
+      gradient: "linear-gradient(to right, #A78BFA, #8B5CF6)",
     },
     {
       icon: <FaFileUpload />,
@@ -48,6 +50,7 @@ export default function Home() {
       description: "Upload your resume to AWS S3 and get AI-powered feedback to optimize it for technical interviews.",
       link: "/upload",
       color: "#8B5CF6",
+      gradient: "linear-gradient(to right, #C084FC, #A855F7)",
     },
     {
       icon: <FaTrophy />,
@@ -55,6 +58,7 @@ export default function Home() {
       description: "Compete with other users and see where you rank based on total problems solved and points earned.",
       link: "/dashboard",
       color: "#A78BFA",
+      gradient: "linear-gradient(to right, #D8B4FE, #C084FC)",
     },
   ]
 
@@ -80,7 +84,7 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", overflow: "hidden" }}>
-      {/* Liquid Chrome background effect - fixed behind all content */}
+      {/* Liquid Ether background effect - fixed behind all content */}
       <div
         style={{
           position: "fixed",
@@ -91,7 +95,15 @@ export default function Home() {
           zIndex: 0,
         }}
       >
-        <DynamicLiquidChrome baseColor={[0.08, 0.08, 0.12]} speed={0.8} amplitude={0.5} interactive={true} />
+        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+          <DynamicSilk
+            speed={5}
+            scale={1}
+            color="#7B7481"
+            noiseIntensity={1.5}
+            rotation={0}
+          />
+        </div>
       </div>
 
       {/* All content above the background */}
@@ -105,13 +117,12 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className={`page-title ${styles.glassTextGlow}`} style={{
-              textShadow: "2px 2px 0px rgba(0,0,0,0.3), -1px -1px 0px rgba(255,255,255,0.1)",
-              WebkitTextStroke: "1px rgba(255,255,255,0.1)"
+            <h1 className={styles.primaryHeading} style={{
+              textShadow: "2px 2px 0px rgba(0,0,0,0.3), -1px -1px 0px rgba(255,255,255,0.03)"
             }}>
               Welcome to InterviewMate
             </h1>
-            <p className="page-subtitle" style={{
+            <p className={styles.subheading} style={{
               textShadow: "1px 1px 2px rgba(0,0,0,0.5)"
             }}>
               Your complete platform for technical interview preparation
@@ -121,15 +132,18 @@ export default function Home() {
           {/* Features Grid */}
           <motion.div className="row g-4 mb-5" variants={containerVariants} initial="hidden" animate="visible">
             {features.map((feature, index) => (
-              <motion.div key={index} className="col-md-6 col-lg-3" variants={itemVariants}>
+                <motion.div key={index} className="col-md-6 col-lg-3" variants={itemVariants}>
                 <AnimatedCard delay={index * 0.1}>
                   <div className={`${styles.cardIconGlass} card-icon`} style={{ color: feature.color }}>
                     {feature.icon}
                   </div>
-                  <h3 className="card-title" style={{
-                    textShadow: "1px 1px 2px rgba(0,0,0,0.4), -0.5px -0.5px 1px rgba(255,255,255,0.05)"
-                  }}>{feature.title}</h3>
-                  <p className="card-text" style={{
+                  <h3
+                    className={`${styles.cardTitle} ${feature.gradient ? styles.gradientText : ''}`}
+                    style={feature.gradient ? { background: feature.gradient } : {}}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p className={styles.cardDescription} style={{
                     textShadow: "1px 1px 1px rgba(0,0,0,0.3)"
                   }}>{feature.description}</p>
                   <motion.button
@@ -155,16 +169,16 @@ export default function Home() {
               viewport={{ once: true }}
             >
             <div className={styles.glassFeatureCard}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: '#60A5FA' }}>
                   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                 </svg>
-                <h3 className="card-title" style={{ 
+                <h3 className={styles.cardTitle} style={{ 
                   margin: 0,
                   textShadow: "1px 1px 2px rgba(0,0,0,0.4), -0.5px -0.5px 1px rgba(255,255,255,0.05)"
                 }}>Quick Stats</h3>
               </div>
-              <p className="card-text mb-4" style={{
+              <p className={styles.cardDescription + ' mb-4'} style={{
                 textShadow: "1px 1px 1px rgba(0,0,0,0.3)"
               }}>Track your progress and stay motivated with real-time statistics</p>
               <div className="row text-center g-3">
@@ -246,7 +260,7 @@ export default function Home() {
                   <path d="M12 16v-4"></path>
                   <path d="M12 8h.01"></path>
                 </svg>
-                <h3 className="card-title" style={{ 
+                <h3 className={styles.cardTitle} style={{ 
                   margin: 0,
                   textShadow: "1px 1px 2px rgba(0,0,0,0.4), -0.5px -0.5px 1px rgba(255,255,255,0.05)"
                 }}>Pro Tips</h3>
@@ -282,7 +296,7 @@ export default function Home() {
                   <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                   <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                 </svg>
-                <h3 className="card-title" style={{ 
+                <h3 className={styles.cardTitle} style={{ 
                   margin: 0,
                   textShadow: "1px 1px 2px rgba(0,0,0,0.4), -0.5px -0.5px 1px rgba(255,255,255,0.05)"
                 }}>How InterviewMate Works</h3>

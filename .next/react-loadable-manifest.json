@@ -5,10 +5,10 @@
       "static/chunks/node_modules_bootstrap_dist_js_bootstrap_bundle_min_js.js"
     ]
   },
-  "index.js -> ../components/LiquidChrome": {
-    "id": "index.js -> ../components/LiquidChrome",
+  "index.js -> ../components/Silk": {
+    "id": "index.js -> ../components/Silk",
     "files": [
-      "static/chunks/components_LiquidChrome_js.js"
+      "static/chunks/components_Silk_js.js"
     ]
   }
 }

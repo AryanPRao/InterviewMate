@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/globals.css';
 import { useEffect } from 'react';
+// Google Fonts are provided from pages/_document.js per Next.js guidance.
 
 // Synchronously initialize dev bypass values on the client before React mounts
 // This reduces the chance of client-side auth checks redirecting before
