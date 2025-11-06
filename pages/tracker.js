@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
+import AnimatedList from '../components/AnimatedList';
 import axios from 'axios';
 import { FaPlus, FaEdit, FaTrash, FaMagic, FaLightbulb } from 'react-icons/fa';
 import styles from '../styles/glass.module.css';
@@ -383,11 +384,19 @@ export default function Tracker() {
           onClick={() => setShowSuggestModal(false)}
         >
           <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content" style={{ borderRadius: '20px', border: 'none' }}>
+            <div
+              className={`${styles.glassCard} modal-content`}
+              style={{
+                borderRadius: '20px',
+                background: 'linear-gradient(180deg, rgba(15,9,30,0.94), rgba(23,13,39,0.96))'
+              }}
+            >
               <div className="modal-header" style={{ 
-                background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
                 color: 'white',
-                borderRadius: '20px 20px 0 0'
+                borderRadius: '20px 20px 0 0',
+                border: '1px solid rgba(99,102,241,0.10)',
+                boxShadow: '0 8px 28px rgba(99,102,241,0.10)'
               }}>
                 <h5 className="modal-title">
                   <FaMagic className="me-2" />
@@ -400,28 +409,26 @@ export default function Tracker() {
                 ></button>
               </div>
               <div className="modal-body" style={{ padding: '2rem' }}>
-                <p className="text-muted mb-3">
+                <p style={{ color: '#E6EEF8', marginBottom: '1rem' }}>
                   Get personalized problem recommendations based on your progress!
                 </p>
 
                 <div className="mb-4">
-                  <label className="form-label fw-bold">Would you like to practice a specific topic?</label>
-                  <select
-                    className="form-select"
-                    value={selectedTopic}
-                    onChange={(e) => setSelectedTopic(e.target.value)}
-                  >
-                    {topics.map(topic => (
-                      <option key={topic} value={topic}>{topic}</option>
-                    ))}
-                  </select>
-                  <small className="text-muted">
+                  <label className="form-label fw-bold" style={{ color: '#E6EEF8' }}>Would you like to practice a specific topic?</label>
+                  <AnimatedList
+                    items={topics}
+                    onItemSelect={(item) => setSelectedTopic(item)}
+                    showGradients={true}
+                    enableArrowNavigation={true}
+                    displayScrollbar={true}
+                    initialSelectedIndex={topics.indexOf(selectedTopic)}
+                  />
+                  <small className="d-block mt-2" style={{ color: '#DCE7FF' }}>
                     Select "None" for general recommendations based on your progress
                   </small>
                 </div>
-
                 <button 
-                  className="btn btn-success w-100 mb-3"
+                  className={`${styles.glassButton} w-100 mb-3`}
                   onClick={handleSuggestProblems}
                   disabled={loadingRecommendations}
                 >

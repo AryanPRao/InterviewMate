@@ -4,5 +4,11 @@
     "files": [
       "static/chunks/node_modules_bootstrap_dist_js_bootstrap_bundle_min_js.js"
     ]
+  },
+  "index.js -> ../components/Silk": {
+    "id": "index.js -> ../components/Silk",
+    "files": [
+      "static/chunks/components_Silk_js.js"
+    ]
   }
 }

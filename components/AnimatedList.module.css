@@ -1,0 +1,78 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.scrollList {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 14px;
+  border-radius: 12px;
+  background: transparent;
+}
+
+.scrollList::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollList::-webkit-scrollbar-thumb {
+  background: #271e37;
+  border-radius: 6px;
+}
+
+.noScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.noScrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+.item {
+  padding: 12px 14px;
+  background-color: rgba(23,13,39,0.9);
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.selected {
+  background-color: rgba(39,30,55,0.95);
+  box-shadow: 0 8px 24px rgba(99,102,241,0.12);
+}
+
+.itemText {
+  color: #dbeafe;
+  margin: 0;
+  font-weight: 600;
+}
+
+.topGradient {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  right: 12px;
+  height: 30px;
+  background: linear-gradient(to bottom, rgba(15,11,30,0.95), transparent);
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  border-radius: 8px;
+}
+
+.bottomGradient {
+  position: absolute;
+  bottom: 6px;
+  left: 12px;
+  right: 12px;
+  height: 46px;
+  background: linear-gradient(to top, rgba(15,11,30,0.95), transparent);
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  border-radius: 8px;
+}
