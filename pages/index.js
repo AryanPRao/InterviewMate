@@ -137,10 +137,7 @@ export default function Home() {
                   <div className={`${styles.cardIconGlass} card-icon`} style={{ color: feature.color }}>
                     {feature.icon}
                   </div>
-                  <h3
-                    className={`${styles.cardTitle} ${feature.gradient ? styles.gradientText : ''}`}
-                    style={feature.gradient ? { background: feature.gradient } : {}}
-                  >
+                  <h3 className={styles.cardTitle}>
                     {feature.title}
                   </h3>
                   <p className={styles.cardDescription} style={{

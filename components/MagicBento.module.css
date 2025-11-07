@@ -1,27 +1,27 @@
 .cardGrid {
   display: grid;
-  gap: 0.5em;
-  padding: 0.75em;
-  max-width: 54em;
-  margin: 0 auto; /* center the Bento grid inside its container */
+  gap: 1.5em;
+  padding: 1em;
+  max-width: 90em;
+  margin: 0 auto;
   font-size: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
 }
 
 .magicBentoCard {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   position: relative;
-  aspect-ratio: 4/3;
+  aspect-ratio: unset;
   min-height: 200px;
   width: 100%;
   max-width: 100%;
-  padding: 1.25em;
+  padding: 2em;
   border-radius: 20px;
   border: 1px solid #392e4e;
   background: #060010;
   font-weight: 300;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.3s ease;
 
   --glow-x: 50%;
@@ -101,34 +101,27 @@
 
   .magicBentoCard {
     width: 100%;
-    min-height: 180px;
+    min-height: 250px;
   }
 }
 
-@media (min-width: 600px) {
+@media (min-width: 600px) and (max-width: 1023px) {
   .cardGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+  
+  .magicBentoCard {
+    width: 100%;
   }
 }
 
 @media (min-width: 1024px) {
   .cardGrid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .magicBentoCard:nth-child(3) {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
-
-  .magicBentoCard:nth-child(4) {
-    grid-column: 1 / span 2;
-    grid-row: 2 / span 2;
-  }
-
-  .magicBentoCard:nth-child(6) {
-    grid-column: 4;
-    grid-row: 3;
+    grid-column: 1 / -1;
   }
 }
 

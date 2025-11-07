@@ -158,7 +158,7 @@ export default function Tracker() {
       
       <div className="container-custom">
         <div className={`${styles.pageHeaderGlass} page-header`}>
-          <h1 className={styles.primaryHeading}>Problem Tracker 📝</h1>
+          <h1 className={styles.primaryHeading}>Problem Tracker </h1>
           <p className={styles.subheading}>Keep track of all your coding problems</p>
         </div>
 
@@ -200,7 +200,7 @@ export default function Tracker() {
           </div>
         ) : problems.length === 0 ? (
           <div className={styles.glassFeatureCard + ' text-center fade-in-up'}>
-            <h3 className={styles.cardTitle}>No Problems Yet 🎯</h3>
+            <h3 className={styles.cardTitle}>No Problems Yet </h3>
             <p className={styles.cardDescription}>Start by adding your first coding problem!</p>
           </div>
         ) : (
