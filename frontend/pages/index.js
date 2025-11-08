@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
-import { FaClipboardList, FaChartLine, FaFileUpload, FaTrophy } from 'react-icons/fa';
+import { FaClipboardList, FaChartLine, FaFileUpload, FaTrophy, FaRobot } from 'react-icons/fa';
 
 export default function Home() {
   const router = useRouter();
@@ -28,6 +28,13 @@ export default function Home() {
       color: '#667eea'
     },
     {
+      icon: <FaRobot />,
+      title: 'AI Problem Solver',
+      description: 'Get step-by-step guidance from AI mentor. Get hints, share ideas, and understand problems deeply.',
+      link: '/solver',
+      color: '#9333ea'
+    },
+    {
       icon: <FaChartLine />,
       title: 'Analytics Dashboard',
       description: 'Visualize your progress with beautiful charts showing problems solved by difficulty, topic, and points earned.',
@@ -40,13 +47,6 @@ export default function Home() {
       description: 'Upload your resume to AWS S3 and get AI-powered feedback to optimize it for technical interviews.',
       link: '/upload',
       color: '#48bb78'
-    },
-    {
-      icon: <FaTrophy />,
-      title: 'Leaderboard',
-      description: 'Compete with other users and see where you rank based on total problems solved and points earned.',
-      link: '/dashboard',
-      color: '#ed8936'
     }
   ];
 

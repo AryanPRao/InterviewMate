@@ -57,6 +57,9 @@ export default function Navbar() {
                   <Link href="/dashboard" className="nav-link">Dashboard</Link>
                 </li>
                 <li className="nav-item">
+                  <Link href="/solver" className="nav-link">AI Solver</Link>
+                </li>
+                <li className="nav-item">
                   <Link href="/upload" className="nav-link">Resume</Link>
                 </li>
                 <li className="nav-item">

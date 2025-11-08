@@ -805,6 +805,105 @@ Format your response STRICTLY as a JSON array (no markdown, no extra text):
     except Exception as e:
         return jsonify({'error': f'Recommendation error: {str(e)}'}), 500
 
+# ========== GUIDED PROBLEM SOLVER ENDPOINT ==========
+
+@app.route('/api/solve-problem', methods=['POST'])
+def solve_problem():
+    """
+    Step-by-step guided DSA problem solver.
+    Stages: explain, hint, feedback, solution
+    """
+    try:
+        if not GEMINI_API_KEY:
+            return jsonify({'error': 'Gemini API key not configured'}), 500
+        
+        data = request.get_json()
+        problem = data.get('problem', '').strip()
+        stage = data.get('stage', 'explain')
+        user_input = data.get('user_input', '').strip()
+        conversation_history = data.get('conversation_history', [])  # NEW: Get history
+        
+        if not problem:
+            return jsonify({'error': 'Problem statement missing'}), 400
+        
+        # Core prompt logic
+        base_system_prompt = (
+            "You are an expert DSA mentor. "
+            "You help students solve coding problems step-by-step. "
+            "Your tone is encouraging and structured. "
+            "You always respond in clean Markdown (use bullet points, code blocks where needed). "
+            "IMPORTANT: When giving hints, be progressive. If you've given hints before, make the next one more specific."
+        )
+        
+        # Build context from conversation history
+        context = ""
+        if conversation_history:
+            context = "\n\nPrevious conversation (for your context - you are the Mentor):\n"
+            context += "=" * 60 + "\n"
+            for msg in conversation_history:
+                role = msg.get('role', '')
+                content = msg.get('content', '')
+                if role == 'user':
+                    context += f"[STUDENT SAID]: {content}\n\n"
+                elif role == 'assistant':
+                    context += f"[YOU (MENTOR) SAID]: {content}\n\n"
+            context += "=" * 60 + "\n"
+            context += "Remember: Everything marked [YOU (MENTOR) SAID] was YOUR previous response, not the student's work.\n"
+        
+        # Stage-specific instructions
+        if stage == 'explain':
+            user_prompt = (
+                f"Explain the following problem in simple, beginner-friendly language:\n\n{problem}"
+            )
+        elif stage == 'hint':
+            # Count previous hints to make them progressive
+            hint_count = sum(1 for msg in conversation_history if msg.get('role') == 'user' and 'hint' in msg.get('content', '').lower())
+            
+            if hint_count == 0:
+                hint_instruction = "Give the FIRST hint - be vague and high-level. Just point towards the general approach or data structure without specifics."
+            elif hint_count == 1:
+                hint_instruction = "Give the SECOND hint - be more specific. Mention the exact approach or algorithm, but don't reveal implementation details."
+            elif hint_count == 2:
+                hint_instruction = "Give the THIRD hint - be very direct. Provide key implementation details, edge cases, or the main logic flow."
+            else:
+                hint_instruction = "Give a FINAL hint - at this point, provide almost the complete approach with pseudocode if needed."
+            
+            user_prompt = (
+                f"{hint_instruction}\n\n"
+                f"Problem:\n{problem}\n"
+                f"{context}"
+            )
+        elif stage == 'feedback':
+            user_prompt = (
+                "You are evaluating a student's partial idea. "
+                "Give constructive feedback — tell what's good and what can improve. "
+                "Do not give the full solution yet.\n\n"
+                f"Student's thought:\n{user_input}\n\n"
+                f"Problem:\n{problem}\n"
+                f"{context}"
+            )
+        elif stage == 'solution':
+            user_prompt = (
+                "Now provide the full optimal solution with step-by-step explanation, "
+                "time and space complexity, and possible alternative approaches.\n\n"
+                f"Problem:\n{problem}\n"
+                f"{context}"
+            )
+        else:
+            return jsonify({'error': 'Invalid stage'}), 400
+        
+        # Generate response from Gemini
+        model = genai.GenerativeModel('models/gemini-2.5-flash')
+        response = model.generate_content(f"{base_system_prompt}\n\n{user_prompt}")
+        
+        output = response.text.strip() if response and hasattr(response, 'text') else 'No response.'
+        
+        return jsonify({'response': output}), 200
+        
+    except Exception as e:
+        print('Error in /api/solve-problem:', e)
+        return jsonify({'error': 'Something went wrong processing your request.'}), 500
+
 # ========== LEADERBOARD ENDPOINT ==========
 
 @app.route('/api/leaderboard', methods=['GET'])
