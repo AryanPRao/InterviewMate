@@ -1,10 +1,4 @@
 {
-  "_app.js -> ../utils/devMocks": {
-    "id": "_app.js -> ../utils/devMocks",
-    "files": [
-      "static/chunks/utils_devMocks_js.js"
-    ]
-  },
   "_app.js -> bootstrap/dist/js/bootstrap.bundle.min.js": {
     "id": "_app.js -> bootstrap/dist/js/bootstrap.bundle.min.js",
     "files": [

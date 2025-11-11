@@ -4,9 +4,9 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import Navbar from "../components/Navbar"
 import ThemeToggle from "../components/ThemeToggle"
-import MagicBento from "../components/MagicBento"
+import SimpleBento from "../components/SimpleBento"
 import styles from "../styles/glass.module.css"
-import mbStyles from "../components/MagicBento.module.css"
+import bentoStyles from "../components/SimpleBento.module.css"
 import axios from "axios"
 import {
   Chart as ChartJS,
@@ -180,21 +180,10 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            {/* Summary Cards with Magic Bento */}
-            <MagicBento
-              textAutoHide={false}
-              enableStars={true}
-              enableSpotlight={true}
-              enableBorderGlow={true}
-              enableTilt={true}
-              enableMagnetism={true}
-              clickEffect={true}
-              spotlightRadius={300}
-              particleCount={8}
-              glowColor="102, 126, 234"
+            {/* Summary Cards with Simple Bento */}
+            <SimpleBento
               cards={[
                 {
-                  color: '#0a0118',
                   title: 'Total Problems',
                   label: 'Progress',
                   content: (
@@ -211,10 +200,10 @@ export default function Dashboard() {
                         📝
                       </div>
                       <div>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#f1f5f9', margin: 0 }}>
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0 }}>
                           {summary.total_problems}
                         </h2>
-                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#9CA3AF' }}>
+                        <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.7 }}>
                           Problems Solved
                         </p>
                       </div>
@@ -222,7 +211,6 @@ export default function Dashboard() {
                   )
                 },
                 {
-                  color: '#0a0118',
                   title: 'Total Points',
                   label: 'Score',
                   content: (
@@ -239,10 +227,10 @@ export default function Dashboard() {
                         ⭐
                       </div>
                       <div>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#f1f5f9', margin: 0 }}>
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0 }}>
                           {summary.total_points}
                         </h2>
-                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#9CA3AF' }}>
+                        <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.7 }}>
                           Points Earned
                         </p>
                       </div>
@@ -250,7 +238,6 @@ export default function Dashboard() {
                   )
                 },
                 {
-                  color: '#0a0118',
                   title: 'Difficulty Distribution',
                   label: 'Analysis',
                   content: difficultyData ? (
@@ -265,7 +252,6 @@ export default function Dashboard() {
                               labels: {
                                 padding: 10,
                                 font: { size: 10, weight: 'bold' },
-                                color: '#F9FAFB'
                               },
                             },
                           },
@@ -273,11 +259,10 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-center" style={{ color: '#9CA3AF' }}>No data available</p>
+                    <p className="text-center" style={{ opacity: 0.7 }}>No data available</p>
                   )
                 },
                 {
-                  color: '#0a0118',
                   title: 'Topic Distribution',
                   label: 'Topics',
                   content: topicData ? (
@@ -305,11 +290,10 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-center" style={{ color: '#9CA3AF' }}>No data available</p>
+                    <p className="text-center" style={{ opacity: 0.7 }}>No data available</p>
                   )
                 },
                 {
-                  color: '#0a0118',
                   title: 'Points Progress',
                   label: 'Timeline',
                   content: pointsData ? (
@@ -337,11 +321,10 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-center" style={{ color: '#9CA3AF' }}>No data available</p>
+                    <p className="text-center" style={{ opacity: 0.7 }}>No data available</p>
                   )
                 },
                 {
-                  color: '#0a0118',
                   title: 'Quick Actions',
                   label: 'Navigate',
                   content: (
@@ -372,14 +355,14 @@ export default function Dashboard() {
 
             {summary.total_problems === 0 && (
               <motion.div
-                className={`${mbStyles.magicBentoCard} ${mbStyles.magicBentoCardBorderGlow}`}
-                style={{ backgroundColor: '#0a0118', padding: '1.5rem', borderRadius: '20px', marginTop: '1.5rem' }}
+                className={bentoStyles.bentoCard}
+                style={{ padding: '1.5rem', marginTop: '1.5rem' }}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                  <h3 className={styles.cardTitle} style={{ marginBottom: '0.5rem' }}>No Data Yet</h3>
-                  <p className={styles.cardDescription} style={{ textAlign: 'center', marginBottom: '1.25rem' }}>Start solving problems to see your analytics!</p>
+                  <h3 className={bentoStyles.cardTitle} style={{ marginBottom: '0.5rem' }}>No Data Yet</h3>
+                  <p className={bentoStyles.cardContent} style={{ textAlign: 'center', marginBottom: '1.25rem' }}>Start solving problems to see your analytics!</p>
                   <motion.button
                     className={`${styles.glassButton}`}
                     onClick={() => router.push("/tracker")}

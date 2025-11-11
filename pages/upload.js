@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
-import MagicBento from '../components/MagicBento';
+import SimpleBento from '../components/SimpleBento';
 import axios from 'axios';
 import { FaFileUpload, FaFilePdf, FaDownload, FaMagic } from 'react-icons/fa';
 import styles from '../styles/glass.module.css';
@@ -153,20 +153,24 @@ export default function Upload() {
             style={{ maxWidth: '1600px', margin: '0 auto', padding: '0 2rem' }}
           >
           {(() => {
-            // Build card definitions and choose layout depending on whether
-            // user has uploaded any resumes yet. If there are no resumes,
-            // show a single large Resume Manager card. After upload, show
-            // the two-column layout (Resume Manager + Results) with Storage
-            // spanning full width below.
+            // Three-state layout logic:
+            // 1. No resumes uploaded: Single large Resume Manager (full width)
+            // 2. Resume uploaded but not analyzed: Resume Manager spans both columns above Storage
+            // 3. Resume analyzed: Two-column layout (Resume Manager + Results) with Storage below
+            
+            const hasResumes = resumes.length > 0 || uploadSuccess;
+            const hasAnalysis = showAnalysis && analysis;
+            
             const resumeCard = {
-              color: '#0a0118',
               title: 'Upload & Analyze',
               label: 'Resume Manager',
               style: {
                 aspectRatio: 'unset',
-                minHeight: resumes.length === 0 && !uploadSuccess ? '760px' : '420px',
+                minHeight: !hasResumes ? '760px' : '420px',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                // Span both columns if resumes exist but no analysis yet
+                ...(hasResumes && !hasAnalysis ? { gridColumn: '1 / -1' } : {})
               },
               content: (
                 <div style={{
@@ -288,7 +292,6 @@ export default function Upload() {
             };
 
             const resultsCard = {
-              color: '#0a0118',
               title: 'AI Analysis',
               label: 'Results',
               style: {
@@ -361,7 +364,6 @@ export default function Upload() {
             };
 
             const storageCard = {
-              color: '#0a0118',
               title: 'Storage',
               label: 'Your Uploaded Resumes',
               style: {
@@ -513,7 +515,18 @@ export default function Upload() {
               )
             };
 
-            const cardsToRender = (resumes.length === 0 && !uploadSuccess) ? [resumeCard] : [resumeCard, resultsCard, storageCard];
+            // Determine which cards to render based on state:
+            // - No resumes: Only Resume Manager (will span full width via style)
+            // - Resumes exist but no analysis: Resume Manager + Storage (Manager spans both columns)
+            // - Analysis exists: Resume Manager + Results + Storage (normal 2-column layout)
+            let cardsToRender;
+            if (!hasResumes) {
+              cardsToRender = [resumeCard];
+            } else if (!hasAnalysis) {
+              cardsToRender = [resumeCard, storageCard];
+            } else {
+              cardsToRender = [resumeCard, resultsCard, storageCard];
+            }
 
             // If only the resume manager card will be rendered, force it to
             // span the full grid (both columns) so it fills the section
@@ -526,19 +539,7 @@ export default function Upload() {
             }
 
             return (
-              <MagicBento
-                textAutoHide={false}
-                enableStars={true}
-                enableSpotlight={true}
-                enableBorderGlow={true}
-                enableTilt={true}
-                enableMagnetism={true}
-                clickEffect={true}
-                spotlightRadius={300}
-                particleCount={8}
-                glowColor="99, 102, 241"
-                cards={cardsToRender}
-              />
+              <SimpleBento cards={cardsToRender} />
             );
           })()}
           </motion.div>

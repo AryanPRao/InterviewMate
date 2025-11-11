@@ -88,18 +88,6 @@ function MyApp({ Component, pageProps }) {
         if (!localStorage.getItem('user_email')) {
           localStorage.setItem('user_email', 'dev@local');
         }
-        // Initialize client-side mock handlers (axios interceptors, seed data)
-        try {
-          import('../utils/devMocks').then((mod) => {
-            try {
-              mod.initDevMocks && mod.initDevMocks();
-            } catch (e) {
-              // ignore
-            }
-          });
-        } catch (e) {
-          // ignore dynamic import errors in odd environments
-        }
       }
     } catch (e) {
       // swallow errors to avoid breaking the app in weird environments

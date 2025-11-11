@@ -4,5 +4,5 @@
   "/_document": "pages/_document.js",
   "/dashboard": "pages/dashboard.js",
   "/upload": "pages/upload.js",
-  "/tracker": "pages/tracker.js"
+  "/": "pages/index.js"
 }
