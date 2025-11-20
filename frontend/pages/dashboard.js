@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import { getApiUrl } from '../utils/api';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
@@ -30,11 +31,11 @@ export default function Dashboard() {
       const userId = localStorage.getItem('user_id');
 
       // Fetch summary
-      const summaryRes = await axios.get(`http://localhost:5000/api/analytics/summary?user_id=${userId}`);
+      const summaryRes = await axios.get(getApiUrl(`/api/analytics/summary?user_id=${userId}`));
       setSummary(summaryRes.data);
 
       // Fetch difficulty distribution
-      const diffRes = await axios.get(`http://localhost:5000/api/analytics/difficulty?user_id=${userId}`);
+      const diffRes = await axios.get(getApiUrl(`/api/analytics/difficulty?user_id=${userId}`));
       if (diffRes.data.length > 0) {
         setDifficultyData({
           labels: diffRes.data.map(d => d.difficulty),
@@ -47,7 +48,7 @@ export default function Dashboard() {
       }
 
       // Fetch topic distribution
-      const topicRes = await axios.get(`http://localhost:5000/api/analytics/topic?user_id=${userId}`);
+      const topicRes = await axios.get(getApiUrl(`/api/analytics/topic?user_id=${userId}`));
       if (topicRes.data.length > 0) {
         setTopicData({
           labels: topicRes.data.map(t => t.topic),
@@ -61,7 +62,7 @@ export default function Dashboard() {
       }
 
       // Fetch points over time
-      const pointsRes = await axios.get(`http://localhost:5000/api/analytics/points?user_id=${userId}`);
+      const pointsRes = await axios.get(getApiUrl(`/api/analytics/points?user_id=${userId}`));
       if (pointsRes.data.length > 0) {
         setPointsData({
           labels: pointsRes.data.map(p => new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
@@ -81,7 +82,7 @@ export default function Dashboard() {
       }
 
       // Fetch leaderboard
-      const leaderRes = await axios.get('http://localhost:5000/api/leaderboard');
+      const leaderRes = await axios.get(getApiUrl('/api/leaderboard'));
       setLeaderboard(leaderRes.data);
 
     } catch (error) {

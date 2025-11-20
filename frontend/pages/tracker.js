@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
+import { getApiUrl } from '../utils/api';
 import { FaPlus, FaEdit, FaTrash, FaMagic, FaLightbulb, FaStickyNote } from 'react-icons/fa';
 
 export default function Tracker() {
@@ -41,7 +42,7 @@ export default function Tracker() {
   const fetchProblems = async () => {
     try {
       const userId = localStorage.getItem('user_id');
-      const response = await axios.get(`http://localhost:5000/api/problems?user_id=${userId}`);
+      const response = await axios.get(getApiUrl(`/api/problems?user_id=${userId}`));
       setProblems(response.data);
     } catch (error) {
       console.error('Error fetching problems:', error);
@@ -64,10 +65,10 @@ export default function Tracker() {
     try {
       if (editingProblem) {
         // Update existing problem
-        await axios.put(`http://localhost:5000/api/problems/${editingProblem.id}`, formData);
+        await axios.put(getApiUrl(`/api/problems/${editingProblem.id}`), formData);
       } else {
         // Add new problem
-        await axios.post('http://localhost:5000/api/problems', {
+        await axios.post(getApiUrl('/api/problems'), {
           ...formData,
           user_id: userId
         });
@@ -107,7 +108,7 @@ export default function Tracker() {
     if (!confirm('Are you sure you want to delete this problem?')) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/problems/${problemId}`);
+      await axios.delete(getApiUrl(`/api/problems/${problemId}`));
       fetchProblems();
     } catch (error) {
       console.error('Error deleting problem:', error);
@@ -121,7 +122,7 @@ export default function Tracker() {
 
     try {
       const userId = localStorage.getItem('user_id');
-      const response = await axios.post('http://localhost:5000/api/suggest-problems', {
+      const response = await axios.post(getApiUrl('/api/suggest-problems'), {
         user_id: userId,
         topic: selectedTopic === 'None' ? null : selectedTopic
       });
@@ -364,17 +365,6 @@ export default function Tracker() {
                       rows="3"
                       placeholder="Brief notes about the problem..."
                       value={formData.summary}
-                      onChange={handleChange}
-                    ></textarea>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label-custom">Notes (Optional)</label>
-                    <textarea
-                      name="notes"
-                      className="form-control form-control-custom"
-                      rows="4"
-                      placeholder="Your detailed notes or insights about this problem..."
-                      value={formData.notes}
                       onChange={handleChange}
                     ></textarea>
                   </div>

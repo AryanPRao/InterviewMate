@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { getApiUrl } from '../utils/api';
 
 export default function Login() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/login', {
+      const response = await axios.post(getApiUrl('/api/login'), {
         email: formData.email,
         password: formData.password
       });

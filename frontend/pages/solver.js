@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { getApiUrl } from '../utils/api';
 import Navbar from '../components/Navbar';
 import { FaRobot, FaLightbulb, FaComments, FaKey, FaPaperPlane, FaCheckCircle, FaRedo } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
@@ -50,7 +51,7 @@ export default function GuidedSolver() {
         .filter(msg => msg.role !== 'system')
         .map(msg => ({ role: msg.role, content: msg.content }));
 
-      const res = await axios.post('http://localhost:5000/api/solve-problem', {
+      const res = await axios.post(getApiUrl('/api/solve-problem'), {
         problem: problemText,
         stage,
         user_input: idea,

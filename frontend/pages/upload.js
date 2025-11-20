@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { getApiUrl } from '../utils/api';
 import { FaFileUpload, FaFilePdf, FaDownload, FaMagic } from 'react-icons/fa';
 
 export default function Upload() {
@@ -31,7 +30,7 @@ export default function Upload() {
     try {
       setLoading(true);
       const userId = localStorage.getItem('user_id');
-      const response = await axios.get(`http://localhost:5000/api/resumes?user_id=${userId}`);
+      const response = await axios.get(getApiUrl(`/api/resumes?user_id=${userId}`));
       setResumes(response.data);
     } catch (error) {
       console.error('Error fetching resumes:', error);
@@ -72,7 +71,7 @@ export default function Upload() {
       formData.append('file', selectedFile);
       formData.append('user_id', userId);
 
-      await axios.post('http://localhost:5000/api/upload-resume', formData, {
+      await axios.post(getApiUrl('/api/upload-resume'), formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -106,7 +105,7 @@ export default function Upload() {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const response = await axios.post('http://localhost:5000/api/analyze-resume', formData, {
+      const response = await axios.post(getApiUrl('/api/analyze-resume'), formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -208,10 +207,12 @@ export default function Upload() {
                   </h4>
                 </div>
                 <div className="card-body p-4">
-                  <div className="markdown-body" style={{ lineHeight: '1.8', fontSize: '1rem' }}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {analysis}
-                    </ReactMarkdown>
+                  <div style={{ 
+                    whiteSpace: 'pre-wrap', 
+                    lineHeight: '1.8',
+                    fontSize: '1rem'
+                  }}>
+                    {analysis}
                   </div>
                 </div>
               </div>
